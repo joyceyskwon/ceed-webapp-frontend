@@ -1,18 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import PostContainer from './PostContainer'
+import Auth from './Auth';
+import PostContainer from './PostContainer';
 
 class App extends React.Component {
   state = {
-    posts: [] 
+    posts: [],
+    newUserName: '',
+    newUserEmail: '',
+    newUserPassword: '',
+    currentUser: null,
   }
 
   componentDidMount() {
-    this.fetchUsers()
+    this.fetchPosts()
   }
 
-  fetchUsers = () => {
+  fetchPosts = () => {
     fetch('http://localhost:3000/api/v1/posts')
     .then(r => r.json())
     .then(posts => {
@@ -22,10 +26,46 @@ class App extends React.Component {
     })
   }
 
+  handleSignupInputs = e => {
+    console.log('New User Input ', e.target.name, ': ', e.target.value);
+    this.setState({
+      [e.target.name]: e.target.value
+    })
+  }
+
+  handleSignupSubmit = e => {
+    e.preventDefault()
+    fetch('http://localhost:3000/api/v1/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        user: {
+          name: this.state.newUserName,
+          email: this.state.newUserEmail,
+          password: this.state.newUserPassword
+        }
+      })
+    })
+    .then(r => r.json())
+    .then(newUser => {
+      console.log(newUser, ': NEW USER AFTER FETCH')
+      this.setState({
+        currentUser: newUser || null
+      })
+    })
+  }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
+          <Auth 
+            handleSignupInputs={this.handleSignupInputs}
+            handleSignupSubmit={this.handleSignupSubmit}
+          />
           <PostContainer 
             posts={this.state.posts}
           />
