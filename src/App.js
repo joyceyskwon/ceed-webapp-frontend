@@ -1,7 +1,9 @@
 import React from 'react';
 import './App.css';
-import Auth from './Auth';
+import Auth from './components/Auth';
+import Navigation from './components/Navigation';
 import PostContainer from './PostContainer';
+import { Switch, Route } from 'react-router-dom';
 
 class App extends React.Component {
   state = {
@@ -9,6 +11,8 @@ class App extends React.Component {
     newUserName: '',
     newUserEmail: '',
     newUserPassword: '',
+    loginEmail: '',
+    loginPassword: '',
     currentUser: null,
   }
 
@@ -58,17 +62,52 @@ class App extends React.Component {
     })
   }
 
+  handleLoginInputs = e => {
+    console.log('Login User Input ', e.target.name, ': ', e.target.value);
+    this.setState({
+      [e.target.name]: e.target.value
+    })
+  }
+
+  handleLoginSubmit = e => {
+    e.preventDefault();
+    fetch('http://localhost:3000/api/v1/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        email: this.state.loginEmail,
+        password: this.state.loginPassword
+      })
+    })
+    .then(r => r.json())
+    .then(user => console.log(user))
+  }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <Auth 
+          <Navigation 
             handleSignupInputs={this.handleSignupInputs}
             handleSignupSubmit={this.handleSignupSubmit}
+            handleLoginInputs={this.handleLoginInputs}
+            handleLoginSubmit={this.handleLoginSubmit}
           />
-          <PostContainer 
-            posts={this.state.posts}
-          />
+          <Switch>
+            <Route 
+              path='/'
+              render={() => <PostContainer
+                posts={this.state.posts}
+              />}
+            />
+            <Route 
+              path='/login'
+              render={() => <Login}
+            />
+          </Switch>
         </header>
       </div>
     )

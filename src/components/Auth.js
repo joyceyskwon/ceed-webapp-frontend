@@ -5,7 +5,10 @@ import Signup from './Signup';
 const Auth = props => {
   return (
     <div>
-      <Login />
+      <Login 
+        handleLoginInputs={props.handleLoginInputs}
+        handleLoginSubmit={props.handleLoginSubmit}
+      />
       <p>New to Ceed?</p>
       <Signup 
         handleSignupInputs={props.handleSignupInputs}
